@@ -1,31 +1,30 @@
 import csv, re, codecs
 
 class Csvo(object):
-    def __init__(self, file):
-        # create self.sheet as a DictReader object
+    def __init__(self, file, header=False):
         self.file = file
+        self.header = header
         self.table = []
-        with open(file) as csvfile:
-            sheet = csv.DictReader(csvfile)
-            for row in sheet:
-                self.table.append(row)
+
+        with open(file, 'rb') as csvfile:
+            spamreader = csv.reader(csvfile, dialect='excel')
+            print spamreader
+            for row in spamreader:
+                self.table.append(row) #x.strip() for x in row.split(','))
 
     def csvencoding(self):
         ## identify encoding and return in UTF-8
         for row in self.table:
-            i = 0
-            for key, value in row.iteritems():
-                try:
-                    self.table[i][key] = value.encode("utf8")
-                except:
-                    pass
-                i+=1
+            i=0
+            for item in row:
+                j=0
+                self.table[i][j]=item.encode("utf8")
+                j+=1
+            i+=1
+        return
 
-        return self.csvprint()
-
-    def beginspaceclean(self, text):
-        ## remove leading and trailing spaces and multiple spaces
-        return re.sub('^\s+','', text)
+    def spaceclean(self, text):
+        return text.strip()
 
     def newlinebeginspaceclean(self, text):
         ## remove leading and trailing spaces and multiple spaces
@@ -34,6 +33,14 @@ class Csvo(object):
     def newlineendspaceclean(self, text):
         ## remove leading and trailing spaces and multiple spaces
         return re.sub('\s+\n','', text)
+
+    def returnbeginspaceclean(self, text):
+        ## remove leading and trailing spaces and multiple spaces
+        return re.sub('\r\s+','', text)
+
+    def returnendspaceclean(self, text):
+        ## remove leading and trailing spaces and multiple spaces
+        return re.sub('\s+\r','', text)
 
     def endspaceclean(self, text):
         ## remove leading and trailing spaces and multiple spaces
@@ -60,26 +67,24 @@ class Csvo(object):
 
     def cleancsv(self):
         self.csvencoding()
-        i = 0
+        i = 1
         for row in self.table:
-            for key,val in row.iteritems():
-                print key, val
-                self.table[i][key]=self.beginspaceclean(val)
-                self.table[i][key]==self.newlinebeginspaceclean(val)
-                self.table[i][key]==self.newlineendspaceclean(val)
-                self.table[i][key]==self.endspaceclean(val)
-                self.table[i][key]==self.xtraspaceclean(val)
-                self.table[i][key]==self.begreturnclean(val)
-                self.table[i][key]==self.innerreturnclean(val)
-                self.table[i][key]==self.listreturnclean(val)
-                print key, self.table[i][key]
+            for item in row:
+                j = 0
+                print item
+                self.table[i][j]=re.sub("\s{2,}", " ", item.strip())
+                self.table[i][j]=re.sub("\r|\n", "", self.table[i][j])
+                #print re.sub("\d", "a)", item.strip())
+
+                j+=1
             i+=1
+        print self.table
         return self.table
 
     def csvprint(self):
         print str(len(self.table)) + " rows"
         for row in self.table:
-            print ' | '.join('{}: {}'.format(key, value) for key, value in row.items())
+            print ' | '.join(row)
 
     def csvout(self):
         self.csvencoding()
@@ -87,14 +92,10 @@ class Csvo(object):
         outfile = str(self.file).replace('.csv', '_out.csv')
 
         with open(outfile, 'w') as csvfile:
-            fieldnames = self.table[1].keys()
-            print fieldnames
-            csvwriter = csv.DictWriter(csvfile, fieldnames=fieldnames)
-
-            csvwriter.writeheader()
-            #csvwriter = csv.writer(csvfile, delimiter=',',
-             #               quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            #csvwriter.writeheader()
+            if self.header:
+                fieldnames = self.table[0]
+                print fieldnames
+            csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             for row in self.table:
                 csvwriter.writerow(row)
         return
@@ -104,7 +105,7 @@ class Csvo(object):
 
 
 
-test1 = Csvo('test2.csv')
+test1 = Csvo('test2.csv', True)
 test1.csvprint()
 #test1.csvencoding()
 #test1.cleancsv()
