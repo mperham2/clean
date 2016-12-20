@@ -15,14 +15,9 @@ class Csvo(object):
     def csvencoding(self):
         ## identify encoding and return in UTF-8
         print "csvencoding"
-        i=0
-        for row in self.table:
-            print i, row
-            j=0
-            for item in row:
+        for i, row in enumerate(self.table):
+            for j, item in enumerate(row):
                 self.table[i][j]=item.encode("utf8")
-                j+=1
-            i+=1
         return
 
     def spaceclean(self, text):
@@ -61,26 +56,28 @@ class Csvo(object):
         ## remove returns on blank lines
         return re.sub("\n{2,}", "\n", text)
 
-    def listrepl(self,matchobj):
+    def listrepl(self,m):
         return m.group(1)
 
-    def listreturnclean(self, text):
-        return re.sub("(\d\))(\n)",self.listrepl, text)
+    def listreturncleanreturn(self, text):
+        return re.sub("(\d\))(\n|\r)",self.listrepl, text)
+
+    def listaddret(self,m):
+        return m.group(1) + "\r" + m.group(2)
+
+    def listreturncleanlist(self, text):
+        return re.sub("(\w)(\d\))",self.listaddret, text)
 
     def cleancsv(self):
         self.csvencoding()
         print "cleancsv"
-        i = 0
-        for row in self.table:
-            j = 0
-            for item in row:
-                print item
-                print self.table[i][j]
-                self.table[i][j]=re.sub("\s{2,}", " ", item.strip())
-                self.table[i][j]=re.sub("\r|\n", "", self.table[i][j])
-                #print re.sub("\d", "a)", item.strip())
-                j+=1
-            i+=1
+        for i, row in enumerate(self.table):
+            for j, item in enumerate(row):
+                item=re.sub("\s{2,}", " ", item.strip())
+                item=re.sub("\r|\n", "", item)
+                item=self.listreturncleanreturn(item)
+                item=self.listreturncleanlist(item)
+                self.table[i][j]=item
         print self.table
         return self.table
 

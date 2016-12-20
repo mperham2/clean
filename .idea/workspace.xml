@@ -4,7 +4,6 @@
     <list default="true" id="28424bed-80df-4d14-8097-42c49a03dbca" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cleanlist.py" afterPath="$PROJECT_DIR$/cleanlist.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test2_out.csv" afterPath="$PROJECT_DIR$/test2_out.csv" />
     </list>
     <ignored path="clean.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -38,8 +37,8 @@
       <file leaf-file-name="cleanlist.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/cleanlist.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.5870842">
-              <caret line="99" column="53" selection-start-line="99" selection-start-column="53" selection-end-line="99" selection-end-column="53" />
+            <state vertical-scroll-proportion="0.76516634">
+              <caret line="79" column="28" selection-start-line="79" selection-start-column="28" selection-end-line="79" selection-end-column="28" />
               <folding />
             </state>
           </provider>
@@ -81,8 +80,8 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="59" />
-    <option name="y" value="158" />
+    <option name="x" value="449" />
+    <option name="y" value="155" />
     <option name="width" value="769" />
     <option name="height" value="634" />
   </component>
@@ -273,7 +272,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="59" y="158" width="769" height="634" extended-state="0" />
+    <frame x="449" y="155" width="769" height="634" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20416124" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -329,8 +328,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/cleanlist.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5870842">
-          <caret line="99" column="53" selection-start-line="99" selection-start-column="53" selection-end-line="99" selection-end-column="53" />
+        <state vertical-scroll-proportion="0.76516634">
+          <caret line="79" column="28" selection-start-line="79" selection-start-column="28" selection-end-line="79" selection-end-column="28" />
           <folding />
         </state>
       </provider>
