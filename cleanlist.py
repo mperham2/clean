@@ -14,10 +14,12 @@ class Csvo(object):
 
     def csvencoding(self):
         ## identify encoding and return in UTF-8
+        print "csvencoding"
+        i=0
         for row in self.table:
-            i=0
+            print i, row
+            j=0
             for item in row:
-                j=0
                 self.table[i][j]=item.encode("utf8")
                 j+=1
             i+=1
@@ -67,15 +69,16 @@ class Csvo(object):
 
     def cleancsv(self):
         self.csvencoding()
-        i = 1
+        print "cleancsv"
+        i = 0
         for row in self.table:
+            j = 0
             for item in row:
-                j = 0
                 print item
+                print self.table[i][j]
                 self.table[i][j]=re.sub("\s{2,}", " ", item.strip())
                 self.table[i][j]=re.sub("\r|\n", "", self.table[i][j])
                 #print re.sub("\d", "a)", item.strip())
-
                 j+=1
             i+=1
         print self.table
@@ -87,14 +90,14 @@ class Csvo(object):
             print ' | '.join(row)
 
     def csvout(self):
-        self.csvencoding()
         self.cleancsv()
         outfile = str(self.file).replace('.csv', '_out.csv')
 
         with open(outfile, 'w') as csvfile:
             if self.header:
+                print self.table
                 fieldnames = self.table[0]
-                print fieldnames
+                print "fieldnames:" + str(fieldnames)
             csvwriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             for row in self.table:
                 csvwriter.writerow(row)
@@ -106,7 +109,7 @@ class Csvo(object):
 
 
 test1 = Csvo('test2.csv', True)
-test1.csvprint()
+#test1.csvprint()
 #test1.csvencoding()
 #test1.cleancsv()
 test1.csvout()
