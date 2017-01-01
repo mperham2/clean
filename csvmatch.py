@@ -113,37 +113,57 @@ def weightscores(scoremat1, scoremat2, datescores, weight1, weight2, dateweight)
         scoremat.append(scorerow)           
     return scoremat
 
-def sortscores(scoremat):
+def sortscores(scoremat, score_value_limit, csvdata2_len):
     # sort the scores, searching for the highest score per row
     # output a list of 2-item lists matching the rows from the two data sets
-    match_list = []
-    checklist = []
+    match_list = [] # the index of matched rows from csvdata1 and csvdata2
+    checklist = [] # list of rows matched in csvdata2
+    csvdata2_idx = list(n for n in range(csvdata2_len))
+    #print(csvdata2_idx)
     for mat1idx, row in enumerate(scoremat):
         max_value = max(row)
         max2_index = row.index(max_value)
-        
+        # if there is no score above score_value_limit, make an unmatched row for mat1
+        if max_value < score_value_limit:
+            max2_index = None
         # if max index is already in the matchlist, find the second closest match
-        if max2_index in checklist:
+        elif max2_index in checklist:
             second_max = 0
             for score in row:
                 if score > second_max and score < max_value and (row.index(score) not in checklist):
                     second_max = score
             max2_index = row.index(second_max)
 
+        # remove data2 index from full list of data2 indices
+        if max2_index is not None:
+            csvdata2_idx.remove(max2_index)
+            
         match_list.append([mat1idx, max2_index])
         checklist.append(max2_index)
+    # now append rows from matrix2 that don't have matches...
+    for data2idx in csvdata2_idx:
+        match_list.append([None, data2idx])
+        checklist.append(data2idx)
     return match_list
 
 def makecsvoutdata(match_list, headers, csvdata1, csvdata2):
     outdata = []
     indxbump = 0
+    rowlen1, rowlen2 = len(csvdata1[1]), len(csvdata2[1])
     if headers:
         headerline = csvdata1[0]+csvdata2[0]
         outdata.append(headerline)
         indxbump = 1
     for matchrow in match_list:
-        linefirst = csvdata1[matchrow[0]+indxbump]
-        linesecond = csvdata2[matchrow[1]+indxbump]
+        if matchrow[0] == None:
+            linefirst = (rowlen1) * [""]
+            linesecond = csvdata2[matchrow[1]+indxbump]
+        elif matchrow[1] == None:
+            linefirst = csvdata1[matchrow[0]+indxbump]
+            linesecond = (rowlen2) * [""]
+        else:
+            linefirst = csvdata1[matchrow[0]+indxbump]
+            linesecond = csvdata2[matchrow[1]+indxbump]
         line = linefirst + linesecond
         outdata.append(line)
     return outdata
@@ -156,6 +176,7 @@ def writecsv(outdata, outputList):
                 outline = outline + str(item) + ","
             outline = outline + "\n"
             csvfile.writelines(outline)
+            print(outline)
     return outputList
 
 # main gets the arguments and calls the appropriate functions in order
@@ -196,6 +217,9 @@ def main(*args):
     else:
         nhdata1 = data1[:]
         nhdata2 = data2[:]
+
+    csvdata1_length = len(nhdata1)
+    csvdata2_length = len(nhdata2)
     
     ### Read and convert dates
     if is_datecol:
@@ -206,10 +230,10 @@ def main(*args):
     col1scores = generate_scores(headers, data1, data2, data1col1, data2col1)
     col2scores = generate_scores(headers, data1, data2, data1col2, data2col2)
     datescores = datescore(nhdata1, nhdata2, datecol1, datecol2, daylimit=30)
-    pprint.pprint(datescores)
-    weightedmat = weightscores(col1scores, col2scores, datescores, 1, 3, 20)
-    matchlist = sortscores(weightedmat)
-    print(matchlist)
+    weightedmat = weightscores(col1scores, col2scores, datescores, 7, 3, 3)
+    #pprint.pprint(weightedmat)
+    matchlist = sortscores(weightedmat, 50, csvdata2_length)
+    pprint.pprint(matchlist)
     outdata = makecsvoutdata(matchlist, headers, data1, data2)
     #pprint.pprint(outdata)
     writecsv(outdata, outputList)
