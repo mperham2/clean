@@ -95,21 +95,40 @@ def datescore(csvdata1, csvdata2, datecol1, datecol2, daylimit):
         datescores.append(singledatescores)
     return datescores
 
+def numscore(nhdata1, nhdata2, numcol1, numcol2):
+        # assumes headerless data
+    numscores = []
+    for row_data1 in nhdata1:
+        singlenumscores=[]
+        for row_data2 in nhdata2:
+            data1num = float(row_data1[numcol1-1])
+            data2num = float(row_data2[numcol2-1])
+            print(data1num, data2num)
+            if data1num == data2num:
+                singlenumscores.append(100)
+            elif abs(data1num/data2num)<0.5:
+                singlenumscores.append(50)
+            else:
+                singlenumscores.append(0)
+        numscores.append(singlenumscores)
+    return numscores
 
-def weightscores(scoremat1, scoremat2, datescores, weight1, weight2, dateweight):
+def weightscores(scoremat1, scoremat2, datescores, numscores, weight1, weight2, dateweight, numweight):
     # normalize the weights
-    scoreweight1 = weight1 / (weight1 + weight2 + dateweight)
-    scoreweight2 = weight2 / (weight1 + weight2 + dateweight)
-    scoreweight3 = dateweight / (weight1 + weight2 + dateweight)
+    scoreweight1 = weight1 / (weight1 + weight2 + dateweight + numweight)
+    scoreweight2 = weight2 / (weight1 + weight2 + dateweight + numweight)
+    scoreweight3 = dateweight / (weight1 + weight2 + dateweight + numweight)
+    scoreweight4 = numweight / (weight1 + weight2 + dateweight + numweight)
     scoremat=[]
-    tempmat_outer = zip(scoremat1, scoremat2, datescores)
+    tempmat_outer = zip(scoremat1, scoremat2, datescores, numscores)
     for row in tempmat_outer:
-        temprow = zip(row[0], row[1], row[2])
+        temprow = zip(row[0], row[1], row[2], row[3])
         scorerow = []
         for cell in temprow:
             scorerow.append((scoreweight1*cell[0]+
                              scoreweight2*cell[1]+
-                             scoreweight3*cell[2]))
+                             scoreweight3*cell[2]+
+                             scoreweight4*cell[3]))
         scoremat.append(scorerow)           
     return scoremat
 
@@ -196,8 +215,10 @@ def main(*args):
         is_datecol = args[8] # boolean if using dates
         datecol1 = args[9]   # column number for dates in data1
         datecol2 = args[10]  # column number for dates in data2
+        is_numcol = args[11] # boolean if using a number
+        numcol1 = args[12] # column number for number/currency value in data1
+        numcol2 = args[13] # column number for number/currency value in data2
         
-
     except IndexError:
         print("There was an error with the file names")
         dataList1  = "test.csv"
@@ -230,7 +251,8 @@ def main(*args):
     col1scores = generate_scores(headers, data1, data2, data1col1, data2col1)
     col2scores = generate_scores(headers, data1, data2, data1col2, data2col2)
     datescores = datescore(nhdata1, nhdata2, datecol1, datecol2, daylimit=30)
-    weightedmat = weightscores(col1scores, col2scores, datescores, 7, 3, 3)
+    numscores = numscore(nhdata1, nhdata2, numcol1, numcol2)
+    weightedmat = weightscores(col1scores, col2scores, datescores, numscores, 7, 3, 3, 4)
     #pprint.pprint(weightedmat)
     matchlist = sortscores(weightedmat, 50, csvdata2_length)
     pprint.pprint(matchlist)
@@ -240,5 +262,27 @@ def main(*args):
 
 if __name__=='__main__':
     #main(*sys.argv)
-    main("test.csv", "test2.csv", "test_out.csv", True, 1,1,2,2,1,4,4)
+    main("test.csv", "test2.csv", "test_out.csv", 1,1,1,2,2,1,4,4,1,3,3)
+
+    '''
+        dataList1 = args[0]  # name of csv 1
+        dataList2 = args[1]  # name of csv 2
+        outputList = args[2] # name of output file
+        
+        headers = args[3]    # boolean if there are headers
+        
+        data1col1 = args[4]  # first column for first match in csv 1
+        data2col1 = args[5]  # first column for first match in csv 2
+        
+        data1col2 = args[6]  # second column for second match in csv 1
+        data2col2 = args[7]  # second column for second match in csv 2
+        
+        is_datecol = args[8] # boolean if using dates
+        datecol1 = args[9]   # column number for dates in data1
+        datecol2 = args[10]  # column number for dates in data2
+        
+        is_numcol = args[11] # boolean if using a number
+        numcol1 = args[12] # column number for number/currency value in data1
+        numcol2 = args[13] # column number for number/currency value in data2
+    '''
 
